@@ -3,16 +3,16 @@
 
 Summary: redis
 Name: redis
-Version: 2.0.0
-Release: rc2
+Version: 2.8.4
+Release: stable
 License: BSD
 Group: Applications/Multimedia
 URL: http://code.google.com/p/redis/
 
-Source0: redis-%{version}-%{release}.tar.gz
-Source1: redis.conf
+Source0: redis-%{version}.tar.gz
+#Source1: redis.conf
 
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: gcc, make
 Requires(post): /sbin/chkconfig /usr/sbin/useradd
 Requires(preun): /sbin/chkconfig, /sbin/service
@@ -47,7 +47,7 @@ and so on. Redis is free software released under the very liberal BSD license.
 }
 EOF
 
-%{__cat} <<'EOF' >redis.sysv
+%{__cat} <<'EOF' >redis
 #!/bin/bash
 #
 # Init file for redis
@@ -67,7 +67,7 @@ prog="redis-server"
 
 start() {
   echo -n $"Starting $prog: "
-  daemon --user redis --pidfile %{pid_file} %{_sbindir}/$prog /etc/redis.conf
+  daemon --user redis --pidfile %{pid_file} %{_bindir}/$prog /etc/redis.conf
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch %{_localstatedir}/lock/subsys/$prog
@@ -140,19 +140,22 @@ EOF
 %install
 %{__rm} -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
-%{__install} -Dp -m 0755 redis-server %{buildroot}%{_sbindir}/redis-server
-%{__install} -Dp -m 0755 redis-benchmark %{buildroot}%{_bindir}/redis-benchmark
-%{__install} -Dp -m 0755 redis-cli %{buildroot}%{_bindir}/redis-cli
+%{__install} -Dp -m 0755 src/redis-server %{buildroot}%{_bindir}/redis-server
+%{__install} -Dp -m 0755 src/redis-benchmark %{buildroot}%{_bindir}/redis-benchmark
+%{__install} -Dp -m 0755 src/redis-cli %{buildroot}%{_bindir}/redis-cli
 
 %{__install} -Dp -m 0755 redis.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/redis
-%{__install} -Dp -m 0755 redis.sysv %{buildroot}%{_sysconfdir}/init.d/redis
-%{__install} -Dp -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/redis.conf
+%{__install} -Dp -m 0755 redis %{buildroot}%{_sysconfdir}/init.d/redis
+%{__install} -Dp -m 0755 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
+#%{__install} -Dp -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/redis.conf
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/lib/redis
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
 %{__install} -p -d -m 0755 %{buildroot}%{pid_dir}
 
 %pre
-/usr/sbin/useradd -c 'Redis' -u 499 -s /bin/false -r -d %{_localstatedir}/lib/redis redis 2> /dev/null || :
+/usr/sbin/useradd -c 'redis' -u 499 -s /bin/false -r -d %{_localstatedir}/lib/redis redis 2> /dev/null || :
+mkdir /var/redis
+/bin/chown redis /var/redis
 
 %preun
 if [ $1 = 0 ]; then
@@ -173,14 +176,15 @@ fi
 
 %post
 /sbin/chkconfig --add redis
+/sbin/service redis start
 
 %clean
 %{__rm} -rf %{buildroot}
 
 %files
 %defattr(-, root, root, 0755)
-%doc doc/*.html
-%{_sbindir}/redis-server
+#%doc doc/*.html
+%{_bindir}/redis-server
 %{_bindir}/redis-benchmark
 %{_bindir}/redis-cli
 %{_sysconfdir}/init.d/redis

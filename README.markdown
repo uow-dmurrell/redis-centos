@@ -1,29 +1,26 @@
 # A Recipe for a Redis RPM on CentOS
 
-Perform the following on a build box as root.
+Perform the following on a build box as a user. (not root, never build as root)
+
+## Get the prerequisite files
+    
+    sudo yum install rpmdevtools
+    sudo yum groupinstall 'Development Tools
 
 ## Create an RPM Build Environment
-
-    yum install rpmdevtools
+    cd ~
     rpmdev-setuptree
-
-## Install Prerequisites for RPM Creation
-
-    yum groupinstall 'Development Tools'
+    mkdir tmp
+    cd tmp
 
 ## Download Redis
 
-    cd /tmp
-    wget http://github.com/antirez/redis/tarball/v1.3.9
-    tar -xzf antirez-redis-v1.3.9-0-gd4dd655.tar.gz
-    mv antirez-redis-d495a77 redis-1.3.9
-    tar -czf redis-1.3.9.tar.gz redis-1.3.9
-    cp redis-1.3.9.tar.gz ~/rpmbuild/SOURCES/
+    wget http://download.redis.io/releases/redis-2.8.4.tar.gz
+    cp redis-2.8.4.tar.gz ~/rpmbuild/SOURCES/
 
 ## Get Necessary System-specific Configs
 
-    git clone git://github.com/causes/redis-centos.git
-    cp redis-centos/conf/redis.conf ~/rpmbuild/SOURCES/
+    git clone git://github.com/uow-dmurrell/redis-centos.git
     cp redis-centos/spec/redis.spec ~/rpmbuild/SPECS/
 
 ## Build the RPM
@@ -33,10 +30,11 @@ Perform the following on a build box as root.
 
 The resulting RPM will be:
 
-    ~/rpmbuild/RPMS/x86_64/redis-1.3.9-1.x86_64.rpm
+    ~/rpmbuild/RPMS/x86_64/redis-2.8.4-stable.x86_64.rpm
 
 ## Credits
 
 Based on the `redis.spec` file from Jason Priebe, found on [Google Code][gc].
+(2014) Forked from https://github.com/causes/redis-centos, plus a few improvements from some unmerged pull requests.
 
  [gc]: http://groups.google.com/group/redis-db/files
