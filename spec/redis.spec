@@ -10,7 +10,6 @@ Group: Applications/Multimedia
 URL: http://code.google.com/p/redis/
 
 Source0: redis-%{version}.tar.gz
-#Source1: redis.conf
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: gcc, make
@@ -62,12 +61,19 @@ EOF
 
 source %{_sysconfdir}/init.d/functions
 
+# Check that we're a priviledged user
+if [ `id -u` !=  0 ]; then
+    echo "Script only runs as root"
+    exit 0
+fi
+
+
 RETVAL=0
 prog="redis-server"
 
 start() {
   echo -n $"Starting $prog: "
-  daemon --user redis --pidfile %{pid_file} %{_bindir}/$prog /etc/redis.conf
+  daemon --user redis %{_bindir}/$prog /etc/redis.conf
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch %{_localstatedir}/lock/subsys/$prog
@@ -147,15 +153,12 @@ mkdir -p %{buildroot}%{_bindir}
 %{__install} -Dp -m 0755 redis.logrotate %{buildroot}%{_sysconfdir}/logrotate.d/redis
 %{__install} -Dp -m 0755 redis %{buildroot}%{_sysconfdir}/init.d/redis
 %{__install} -Dp -m 0755 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
-#%{__install} -Dp -m 0644 %{SOURCE1} %{buildroot}%{_sysconfdir}/redis.conf
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/lib/redis
 %{__install} -p -d -m 0755 %{buildroot}%{_localstatedir}/log/redis
 %{__install} -p -d -m 0755 %{buildroot}%{pid_dir}
 
 %pre
 /usr/sbin/useradd -c 'redis' -u 499 -s /bin/false -r -d %{_localstatedir}/lib/redis redis 2> /dev/null || :
-mkdir /var/redis
-/bin/chown redis /var/redis
 
 %preun
 if [ $1 = 0 ]; then
@@ -176,14 +179,20 @@ fi
 
 %post
 /sbin/chkconfig --add redis
-/sbin/service redis start
+sed -i 's|daemonize no|daemonize yes|' /etc/redis.conf
+sed -i 's|pidfile /var/run/redis.pid|pidfile /var/run/redis/redis.pid|' /etc/redis.conf
+sed -i 's|tcp-keepalive 0|tcp-keepalive 60|' /etc/redis.conf 
+sed -i 's|logfile ""|logfile "/var/log/redis/redis.log"|' /etc/redis.conf
+sed -i 's|# syslog-enabled no|syslog-enabled yes|' /etc/redis.conf
+sed -i 's|# syslog-ident redis|syslog-ident redis|' /etc/redis.conf
+sed -i 's|# syslog-facility local0|syslog-facility local0|' /etc/redis.conf
+sed -i 's|dir ./|dir /var/lib/redis|' /etc/redis.conf
+sed -i 's|# maxclients 10000|maxclients 3900|' /etc/redis.conf
 
-%clean
 %{__rm} -rf %{buildroot}
 
 %files
 %defattr(-, root, root, 0755)
-#%doc doc/*.html
 %{_bindir}/redis-server
 %{_bindir}/redis-benchmark
 %{_bindir}/redis-cli
@@ -195,6 +204,12 @@ fi
 %dir %attr(0755,redis,redis) %{_localstatedir}/run/redis
 
 %changelog
+* Wed Jan 29 2014 - uow-dmurrell
+- moved pidfile back to /var/run
+- reverted to standard shipped config
+- sed the config to start in daemon mode
+- removed the doc dir
+
 * Tue Jul 13 2010 - jay at causes dot com 2.0.0-rc2
 - upped to 2.0.0-rc2
 
