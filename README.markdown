@@ -5,7 +5,7 @@ Perform the following on a build box as a user. (not root, never build as root)
 ## Get the prerequisite files
     
     sudo yum install rpmdevtools
-    sudo yum groupinstall 'Development Tools
+    sudo yum groupinstall 'Development Tools'
 
 ## Create an RPM Build Environment
     cd ~
