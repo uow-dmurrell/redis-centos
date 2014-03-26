@@ -3,7 +3,7 @@
 
 Summary: redis
 Name: redis
-Version: 2.8.4
+Version: 2.8.8
 Release: stable
 License: BSD
 Group: Applications/Multimedia
@@ -18,7 +18,7 @@ Requires(preun): /sbin/chkconfig, /sbin/service
 Requires(postun): /sbin/service
 Provides: redis
 
-Packager: Jason Priebe <jpriebe@cbcnewmedia.com>
+Packager: David Murrell <dmurrell@waikato.ac.nz>
 
 %description
 Redis is a key-value database. It is similar to memcached but the dataset is
@@ -204,6 +204,10 @@ sed -i 's|# maxclients 10000|maxclients 3900|' /etc/redis.conf
 %dir %attr(0755,redis,redis) %{_localstatedir}/run/redis
 
 %changelog
+* Wed Mar 26 2014 - uow-dmurrell
+- bumped package to 2.8.8
+- fixed stupid typo in build instructions
+
 * Wed Jan 29 2014 - uow-dmurrell
 - moved pidfile back to /var/run
 - reverted to standard shipped config
