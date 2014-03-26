@@ -20,7 +20,7 @@ Perform the following on a build box as a user. (not root, never build as root)
 
 ## Get Necessary System-specific Configs
 
-    wget https://raw.githubusercontent.com/uow-dmurrell/redis-centos/master/spec/redis.spec
+    wget --no-check-certificate https://raw.githubusercontent.com/uow-dmurrell/redis-centos/master/spec/redis.spec
     cp redis.spec ~/rpmbuild/SPECS/
 
 ## Build the RPM
