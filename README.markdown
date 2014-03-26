@@ -18,9 +18,9 @@ Perform the following on a build box as a user. (not root, never build as root)
     wget http://download.redis.io/releases/redis-2.8.8.tar.gz
     cp redis-2.8.8.tar.gz ~/rpmbuild/SOURCES/
 
-## Get Necessary System-specific Configs
+## Get spec file
 
-    wget --no-check-certificate https://raw.githubusercontent.com/uow-dmurrell/redis-centos/master/spec/redis.spec
+    wget --no-check-certificate https://github.com/uow-dmurrell/redis-centos/raw/master/spec/redis.spec
     cp redis.spec ~/rpmbuild/SPECS/
 
 ## Build the RPM
