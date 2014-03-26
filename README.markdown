@@ -15,7 +15,7 @@ Perform the following on a build box as a user. (not root, never build as root)
 
 ## Download Redis
 
-    wget http://download.redis.io/releases/redis-2.8.4.tar.gz
+    wget http://download.redis.io/releases/redis-2.8.8.tar.gz
     cp redis-2.8.4.tar.gz ~/rpmbuild/SOURCES/
 
 ## Get Necessary System-specific Configs
