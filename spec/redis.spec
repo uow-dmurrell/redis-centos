@@ -3,8 +3,8 @@
 
 Summary: redis
 Name: redis
-Version: latest
-Release: stable
+Version: stable
+Release: latest
 License: BSD
 Group: Applications/Multimedia
 URL: http://redis.io/
