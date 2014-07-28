@@ -3,7 +3,7 @@
 
 Summary: redis
 Name: redis
-Version: 2.8.8
+Version: latest
 Release: stable
 License: BSD
 Group: Applications/Multimedia
