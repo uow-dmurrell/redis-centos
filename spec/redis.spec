@@ -7,9 +7,9 @@ Version: 2.8.8
 Release: stable
 License: BSD
 Group: Applications/Multimedia
-URL: http://code.google.com/p/redis/
+URL: http://redis.io/
 
-Source0: redis-%{version}.tar.gz
+Source0: redis-stable.tar.gz
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 BuildRequires: gcc, make
